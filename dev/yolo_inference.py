@@ -7,10 +7,12 @@ import cv2
 capture_device = 0
 cap = cv2.VideoCapture(capture_device)
 
-def initialize_cap() :
+
+def initialize_cap():
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FPS, 24)
+
 
 initialize_cap()
 
@@ -20,22 +22,29 @@ model = torch.hub.load("WongKinYiu/yolov7", 'custom', model_name)
 model.eval()
 
 
-
-def read_img() :
+def read_img():
     ret, image = cap.read()
-    image = image[:,:,[2,1,0]]
+    if image is not None:
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     return image
 
-def get_prediction(image) :
-    results = model(image, size=640)
-    # x1 | y1 | x2 | y2 | conf | detclass
-    predicted_classes = results.pred[5]
+
+def get_prediction(image):
+    predicted_classes = []
+    if image is not None:
+        results = model(image, size=640)
+        results.save('pred')
+        # x1 | y1 | x2 | y2 | conf | detclass
+        pred = results.pred
+        for r in pred:
+            r_ = r.tolist()
+            for i in r_:
+                predicted_classes.append(i[5])
     return predicted_classes
 
-def inference_detection() :
+
+def inference_detection():
     img = read_img()
     classes = get_prediction(img)
-    det = [1 , 2]
-    if det in classes :
-        return 1
-    return 0
+    det = [1, 2]
+    return classes

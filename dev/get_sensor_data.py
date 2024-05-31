@@ -1,6 +1,6 @@
 import RPi.GPIO as GPIO
 import time
-import PCF8591 as ADC
+import lib.PCF8591 as ADC
 
 DHTPIN = 17  # GPIO  17번
 DO = 26  # GPIO 26번
@@ -129,6 +129,8 @@ def get_sensor_data():
     result = read_dht11_dat()  # 온습도 값 받아옴
     if result:
         humidity, temperature = result
+    else :
+        humidity, temperature = 0, 0
     time.sleep(1)
     setup()  # 기본 설정
     voicevalue, gasvalue = ADC.read(0), ADC.read(1)   # 음량값 가져옴, ADC.read(1) 은 가스센서의 값
